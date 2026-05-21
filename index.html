@@ -1552,17 +1552,20 @@
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     /* ── Formulário: validação + submissão ─────────────────── */
+    /* ── Formulário: validação + submissão (Versão Antiduplicação) ─── */
     function handleFormSubmit(formId, successId) {
       const form = document.getElementById(formId);
       const success = document.getElementById(successId);
       if (!form) return;
 
-      // 🛡️ TRAVA ANTIDUPLICAÇÃO: Se o formulário já foi inicializado, sai da função
-      if (form.dataset.initialized) return;
-      form.dataset.initialized = "true";
+      // Escuta o clique no botão de submit de forma isolada
+      const submitBtn = form.querySelector('.btn-submit');
+      if (!submitBtn) return;
 
-      form.addEventListener('submit', function (e) {
+      submitBtn.addEventListener('click', function (e) {
+        // Para completamente qualquer comportamento nativo ou propagação automática
         e.preventDefault();
+        e.stopPropagation();
 
         /* Validação básica */
         const requiredFields = form.querySelectorAll('[required]');
@@ -1574,15 +1577,18 @@
             valid = false;
           }
         });
+
+        // Se não for válido, para aqui e não faz o push
         if (!valid) return;
 
-        /* ── Coleta dados para dataLayer ──
-           O GTM pode capturar via Trigger "Form Submission"
-           ou consumir o evento customizado abaixo.           */
+        // Desativa o botão imediatamente para evitar cliques duplos/triplos do usuário
+        submitBtn.disabled = true;
+
+        /* Coleta dados para dataLayer */
         const formData = new FormData(form);
         const payload = Object.fromEntries(formData.entries());
 
-        /* Push para o dataLayer (GTM vai escutar este evento) */
+        /* Push ÚNICO para o dataLayer */
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
           event: 'form_submit',
@@ -1598,6 +1604,7 @@
       });
     }
 
+    // Inicializa os formulários
     handleFormSubmit('form-topo', 'success-topo');
     handleFormSubmit('form-rodape', 'success-rodape');
   </script>
