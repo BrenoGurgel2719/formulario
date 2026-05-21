@@ -1557,6 +1557,10 @@
       const success = document.getElementById(successId);
       if (!form) return;
 
+      // 🛡️ TRAVA ANTIDUPLICAÇÃO: Se o formulário já foi inicializado, sai da função
+      if (form.dataset.initialized) return;
+      form.dataset.initialized = "true";
+
       form.addEventListener('submit', function (e) {
         e.preventDefault();
 
