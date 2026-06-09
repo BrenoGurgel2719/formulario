@@ -1584,6 +1584,15 @@
         // Desativa o botão imediatamente para evitar cliques duplos/triplos do usuário
         submitBtn.disabled = true;
 
+        // 🚀 CAPTURA DOS DADOS PARA CONVERSÃO AVANÇADA
+        // Buscamos os valores digitados nos inputs do formulário atual
+
+        const emailInput = form.querySelector('input[type="email"]');
+        const phoneInput = form.querySelector('input[type="tel"]');
+
+        const userEmail = emailInput ? emailInput.value.trim() : '';
+        const userPhone = phoneInput ? phoneInput.value.trim() : '';
+
         /* Coleta dados para dataLayer */
         const formData = new FormData(form);
         const payload = Object.fromEntries(formData.entries());
@@ -1597,6 +1606,8 @@
           form_location: formId === 'form-topo' ? 'hero' : 'rodape',
           lead_area: payload.area || '',
           lead_como_conheceu: payload.como_conheceu || '',
+          lead_email: userEmail,
+          lead_telefone: userPhone
         });
 
         /* UI: esconde form, mostra mensagem de sucesso */
